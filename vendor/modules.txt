@@ -1,0 +1,6 @@
+# github.com/franciscoescher/goopenai v1.0.1
+## explicit; go 1.19
+github.com/franciscoescher/goopenai
+# github.com/google/go-querystring v1.1.0
+## explicit; go 1.10
+github.com/google/go-querystring/query
