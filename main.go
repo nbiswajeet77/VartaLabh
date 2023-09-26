@@ -9,6 +9,7 @@ import (
 
 func handleRequests() {
 	http.HandleFunc("/chat", agents.Chat)
+
 	log.Fatal(http.ListenAndServe(":10000", nil))
 }
 

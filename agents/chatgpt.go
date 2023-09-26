@@ -6,9 +6,12 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"os"
 	"strings"
+
+	"github.com/joho/godotenv"
 
 	"vartalabh.com/m/model"
 )
@@ -56,7 +59,11 @@ func Chat(w http.ResponseWriter, r *http.Request) {
 }
 
 func makeChatGptCall(messages []model.Message) *model.Message {
-	apiKey := "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"
+	err := godotenv.Load(".env")
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
+	apiKey := os.Getenv("API_KEY")
 	endpoint := "https://api.openai.com/v1/chat/completions"
 
 	reqBody := &model.GPT3Request{
