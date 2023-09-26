@@ -15,3 +15,10 @@ type GPT3Request struct {
 	Model    string    `json:"model"`
 	Messages []Message `json:"messages"`
 }
+
+type User struct {
+	ID        int
+	FirstName string `json:"firstname" validate:"required, gte=3"`
+	LastName  string `json:"lastname" validate:"required, gte=3"`
+	Password  string `json:"password"`
+}
