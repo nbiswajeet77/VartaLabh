@@ -17,8 +17,7 @@ type GPT3Request struct {
 }
 
 type User struct {
-	ID        int
-	FirstName string `json:"firstname" validate:"required, gte=3"`
-	LastName  string `json:"lastname" validate:"required, gte=3"`
-	Password  string `json:"password"`
+	ID       int
+	Email    string `json:"email" validate:"required, gte=3"`
+	Password string `json:"password"`
 }

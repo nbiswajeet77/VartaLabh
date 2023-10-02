@@ -20,26 +20,24 @@ func takeInput() string {
 }
 
 func RegisterHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method == "POST" {
+	if true { //r.Method == "POST" {
 		db := agents.DbConn()
-		fmt.Printf("Enter First Name: ")
-		firstName := takeInput()
-		fmt.Printf("Enter Last Name: ")
-		lastName := takeInput()
+		fmt.Printf("Enter Email ID: ")
+		emailID := takeInput()
 		fmt.Printf("Enter Password: ")
 		pass := takeInput()
-		fmt.Printf("%s, %s\n", firstName, lastName)
+		fmt.Printf("%s, %s\n", emailID, pass)
 
 		password, err := bcrypt.GenerateFromPassword([]byte(pass), bcrypt.DefaultCost)
 		if err != nil {
 			fmt.Println(err)
 		}
 
-		_, err = db.Exec("INSERT INTO user(firstname, lastname,password) VALUES(?,?,?)", firstName, lastName, password)
+		_, err = db.Exec("INSERT INTO Users(email,password) VALUES(?,?)", emailID, password)
 		if err != nil {
 			fmt.Println("Error when inserting: ", err.Error())
 			panic(err.Error())
 		}
-		log.Println("=> Inserted: First Name: " + firstName + " | Last Name: " + lastName)
+		log.Println("=> Inserted: Email: " + emailID + " | Last Name: " + pass)
 	}
 }
