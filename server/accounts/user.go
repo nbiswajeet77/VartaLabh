@@ -3,14 +3,12 @@ package accounts
 import (
 	"bufio"
 	"fmt"
-	"log"
 	"net/http"
 	"os"
 	"strings"
 
 	"golang.org/x/crypto/bcrypt"
 	"vartalabh.com/m/agents"
-	"vartalabh.com/m/model"
 )
 
 func takeInput() string {
@@ -22,30 +20,24 @@ func takeInput() string {
 
 func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 	if true { //r.Method == "POST" {
-		db := agents.DbConn()
 		fmt.Printf("Enter Email ID: ")
 		emailID := takeInput()
 		fmt.Printf("Enter Password: ")
 		pass := takeInput()
 		fmt.Printf("%s, %s\n", emailID, pass)
+		prompt := "you are a mental health counsellor. Talk to user, ask repititive questions,keep the conversation going. Also ask the user how much progress he made based on the prompt provided."
 
 		password, err := bcrypt.GenerateFromPassword([]byte(pass), bcrypt.DefaultCost)
 		if err != nil {
 			fmt.Println(err)
 		}
 
-		_, err = db.Exec("INSERT INTO Users(email,password) VALUES(?,?)", emailID, password)
-		if err != nil {
-			fmt.Println("Error when inserting: ", err.Error())
-			panic(err.Error())
-		}
-		log.Println("=> Inserted: Email: " + emailID + " | Last Name: " + pass)
+		agents.CreateUser(emailID, prompt, password)
 	}
 }
 
 func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	if true {
-		db := agents.DbConn()
 		fmt.Printf("Enter Email ID: ")
 		emailID := takeInput()
 		fmt.Printf("Enter Password: ")
@@ -57,22 +49,10 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		checkUser, err := db.Query("SELECT email, password FROM Users WHERE email=?", emailID)
-		if err != nil {
-			panic(err.Error())
-		}
-		user := &model.User{}
-		for checkUser.Next() {
-			var email, password string
-			err = checkUser.Scan(&email, &password)
-			if err != nil {
-				panic(err.Error())
-			}
-			user.Email = email
-			user.Password = password
-		}
+		user := agents.FetchUser(emailID)
+
 		errf := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(pass))
-		if errf != nil && errf == bcrypt.ErrMismatchedHashAndPassword { //Password does not match!
+		if errf != nil { //Password does not match!
 			fmt.Println(errf)
 		} else {
 			fmt.Println("User Logged in successfully")

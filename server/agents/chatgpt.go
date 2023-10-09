@@ -17,7 +17,11 @@ import (
 )
 
 func Chat(w http.ResponseWriter, r *http.Request) {
-	baseRole := "you are a mental health counsellor. Talk to user, ask repititive questions,keep the conversation going. Also ask the user how much progress he made based on the prompt provided."
+
+	userID := "nbiswajeet77" // to be changed
+	user := FetchUser(userID)
+
+	baseRole := user.Prompt
 	messages := []model.Message{
 		{
 			Role:    "system",
@@ -25,36 +29,29 @@ func Chat(w http.ResponseWriter, r *http.Request) {
 		},
 	}
 
-	for i := 0; i < 3; i++ {
-		fmt.Printf("%s %d %s", "*************Session ", i+1, " started*************\n")
-		for j := 0; j < 1000; j++ {
-			fmt.Printf("User: ")
-			in := bufio.NewReader(os.Stdin)
-			input, _ := in.ReadString('\n')
-			input = strings.TrimSpace(input)
-			if input == "exit" {
-				messages = append(messages, model.Message{
-					Role:    "user",
-					Content: "Summarise the entire conversation focusing on what problems the user faced, the summary is for a counsellor",
-				})
-				response := makeChatGptCall(messages)
-				fmt.Println(response.Content)
-				messages = []model.Message{
-					{
-						Role:    "system",
-						Content: baseRole + response.Content,
-					},
-				}
-				break
-			}
+	fmt.Printf("%s", "*************Session started*************\n")
+	for true {
+		fmt.Printf("User: ")
+		in := bufio.NewReader(os.Stdin)
+		input, _ := in.ReadString('\n')
+		input = strings.TrimSpace(input)
+		if input == "exit" {
 			messages = append(messages, model.Message{
 				Role:    "user",
-				Content: input,
+				Content: "Summarise the entire conversation focusing on what problems the user faced, the summary is for a counsellor",
 			})
 			response := makeChatGptCall(messages)
 			fmt.Println(response.Content)
-			messages = append(messages, *response)
+			UpdateUserPrompt(userID, baseRole+response.Content)
+			break
 		}
+		messages = append(messages, model.Message{
+			Role:    "user",
+			Content: input,
+		})
+		response := makeChatGptCall(messages)
+		fmt.Println(response.Content)
+		messages = append(messages, *response)
 	}
 }
 
