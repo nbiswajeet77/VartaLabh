@@ -20,7 +20,6 @@ func DbConn() (db *sql.DB) {
 	dbUser := os.Getenv("DB_USER")
 	dbPass := os.Getenv("DB_PASSWORD")
 	dbName := os.Getenv("DB_NAME")
-	fmt.Println(dbDriver, dbUser, dbPass, dbName)
 	db, err = sql.Open(dbDriver, dbUser+":"+dbPass+"@tcp(127.0.0.1:3306)/"+dbName+"?parseTime=true")
 	if err != nil {
 		panic(err.Error())
@@ -48,14 +47,14 @@ func FetchUser(emailID string) *model.User {
 	return user
 }
 
-func CreateUser(emailID, prompt string, password []byte) {
+func CreateUser(emailID, prompt string, password []byte) error {
 	db := DbConn()
 	_, err := db.Exec("INSERT INTO Users(email,password,prompt) VALUES(?,?,?)", emailID, password, prompt)
 	if err != nil {
 		fmt.Println("Error when inserting: ", err.Error())
-		panic(err.Error())
+		return err
 	}
-	log.Println("=> Inserted: Email: " + emailID)
+	return nil
 }
 
 func UpdateUserPrompt(userID, prompt string) {

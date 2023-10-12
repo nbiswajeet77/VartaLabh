@@ -1,61 +1,67 @@
 package accounts
 
 import (
-	"bufio"
-	"fmt"
+	"encoding/json"
 	"net/http"
-	"os"
 	"strings"
 
 	"golang.org/x/crypto/bcrypt"
 	"vartalabh.com/m/agents"
+	"vartalabh.com/m/model"
 )
 
-func takeInput() string {
-	in := bufio.NewReader(os.Stdin)
-	input, _ := in.ReadString('\n')
-	input = strings.TrimSpace(input)
-	return input
-}
-
 func RegisterHandler(w http.ResponseWriter, r *http.Request) {
-	if true { //r.Method == "POST" {
-		fmt.Printf("Enter Email ID: ")
-		emailID := takeInput()
-		fmt.Printf("Enter Password: ")
-		pass := takeInput()
-		fmt.Printf("%s, %s\n", emailID, pass)
-		prompt := "you are a mental health counsellor. Talk to user, ask repititive questions,keep the conversation going. Also ask the user how much progress he made based on the prompt provided."
-
-		password, err := bcrypt.GenerateFromPassword([]byte(pass), bcrypt.DefaultCost)
+	if r.Method == "POST" {
+		var user model.User
+		err := json.NewDecoder(r.Body).Decode(&user)
 		if err != nil {
-			fmt.Println(err)
+			WriteOutput(w, "Bad Http Request", http.StatusBadRequest, err)
+			return
 		}
 
-		agents.CreateUser(emailID, prompt, password)
+		if strings.Trim(user.Email, " ") == "" || strings.Trim(user.Password, " ") == "" {
+			WriteOutput(w, "UserID or password can't be empty", http.StatusConflict, err)
+			return
+		}
+
+		prompt := "you are a mental health counsellor. Talk to user, ask repititive questions,keep the conversation going. Also ask the user how much progress he made based on the prompt provided."
+
+		password, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
+		if err != nil {
+			WriteOutput(w, "Error while generating hashed password", http.StatusConflict, err)
+			return
+		}
+
+		err = agents.CreateUser(user.Email, prompt, password)
+		if err != nil {
+			WriteOutput(w, "User already registered on application", http.StatusConflict, err)
+			return
+		}
+		WriteOutput(w, "User Registered on application", http.StatusOK, nil)
 	}
 }
 
 func LoginHandler(w http.ResponseWriter, r *http.Request) {
-	if true {
-		fmt.Printf("Enter Email ID: ")
-		emailID := takeInput()
-		fmt.Printf("Enter Password: ")
-		pass := takeInput()
-		fmt.Printf("%s, %s\n", emailID, pass)
-
-		if strings.Trim(emailID, " ") == "" || strings.Trim(pass, " ") == "" {
-			fmt.Println("Parameter's can't be empty")
+	if r.Method == "GET" {
+		var user model.User
+		err := json.NewDecoder(r.Body).Decode(&user)
+		if err != nil {
+			WriteOutput(w, "Bad Http Request", http.StatusBadRequest, err)
 			return
 		}
 
-		user := agents.FetchUser(emailID)
-
-		errf := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(pass))
-		if errf != nil { //Password does not match!
-			fmt.Println(errf)
-		} else {
-			fmt.Println("User Logged in successfully")
+		if strings.Trim(user.Email, " ") == "" || strings.Trim(user.Password, " ") == "" {
+			WriteOutput(w, "UserID or password can't be empty", http.StatusConflict, err)
+			return
 		}
+
+		creds := agents.FetchUser(user.Email)
+
+		errf := bcrypt.CompareHashAndPassword([]byte(creds.Password), []byte(user.Password))
+		if errf != nil {
+			WriteOutput(w, "Either of userId or password is not correct", http.StatusConflict, err)
+			return
+		}
+		WriteOutput(w, "User Signed in application", http.StatusOK, nil)
 	}
 }

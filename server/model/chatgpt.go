@@ -21,3 +21,8 @@ type User struct {
 	Password string `json:"password"`
 	Prompt   string `json:"prompt"`
 }
+
+type Response struct {
+	StatusCode int         `json:"statusCode"`
+	Data       interface{} `json:"data"`
+}
