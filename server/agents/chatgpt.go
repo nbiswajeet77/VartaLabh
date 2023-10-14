@@ -21,7 +21,7 @@ func Chat(w http.ResponseWriter, r *http.Request) {
 	userID := "nbiswajeet77" // to be changed
 	user := FetchUser(userID)
 
-	baseRole := user.Prompt
+	baseRole := user.ChatID
 	messages := []model.Message{
 		{
 			Role:    "system",

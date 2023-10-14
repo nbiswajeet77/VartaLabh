@@ -19,12 +19,10 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		if strings.Trim(user.Email, " ") == "" || strings.Trim(user.Password, " ") == "" {
+		if strings.Trim(user.UserId, " ") == "" || strings.Trim(user.Password, " ") == "" {
 			WriteOutput(w, "UserID or password can't be empty", http.StatusConflict, err)
 			return
 		}
-
-		prompt := "you are a mental health counsellor. Talk to user, ask repititive questions,keep the conversation going. Also ask the user how much progress he made based on the prompt provided."
 
 		password, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
 		if err != nil {
@@ -32,7 +30,7 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		err = agents.CreateUser(user.Email, prompt, password)
+		err = agents.CreateUser(user.UserId, password)
 		if err != nil {
 			WriteOutput(w, "User already registered on application", http.StatusConflict, err)
 			return
@@ -50,12 +48,12 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		if strings.Trim(user.Email, " ") == "" || strings.Trim(user.Password, " ") == "" {
+		if strings.Trim(user.UserId, " ") == "" || strings.Trim(user.Password, " ") == "" {
 			WriteOutput(w, "UserID or password can't be empty", http.StatusConflict, err)
 			return
 		}
 
-		creds := agents.FetchUser(user.Email)
+		creds := agents.FetchUser(user.UserId)
 
 		errf := bcrypt.CompareHashAndPassword([]byte(creds.Password), []byte(user.Password))
 		if errf != nil {

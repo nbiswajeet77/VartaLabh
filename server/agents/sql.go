@@ -27,29 +27,28 @@ func DbConn() (db *sql.DB) {
 	return db
 }
 
-func FetchUser(emailID string) *model.User {
+func FetchUser(userID string) *model.User {
 	db := DbConn()
 	user := &model.User{}
-	checkUser, err := db.Query("SELECT email, password, prompt FROM Users WHERE email=?", emailID)
+	checkUser, err := db.Query("SELECT userID, password FROM Users WHERE userID=?", userID)
 	if err != nil {
 		panic(err.Error())
 	}
 	for checkUser.Next() {
-		var email, password, prompt string
-		err = checkUser.Scan(&email, &password, &prompt)
+		var userID, password string
+		err = checkUser.Scan(&userID, &password)
 		if err != nil {
 			panic(err.Error())
 		}
-		user.Email = email
+		user.UserId = userID
 		user.Password = password
-		user.Prompt = prompt
 	}
 	return user
 }
 
-func CreateUser(emailID, prompt string, password []byte) error {
+func CreateUser(userID string, password []byte) error {
 	db := DbConn()
-	_, err := db.Exec("INSERT INTO Users(email,password,prompt) VALUES(?,?,?)", emailID, password, prompt)
+	_, err := db.Exec("INSERT INTO Users(userID,password) VALUES(?,?)", userID, password)
 	if err != nil {
 		fmt.Println("Error when inserting: ", err.Error())
 		return err
