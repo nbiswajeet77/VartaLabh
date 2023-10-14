@@ -15,27 +15,27 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 		var user model.User
 		err := json.NewDecoder(r.Body).Decode(&user)
 		if err != nil {
-			WriteOutput(w, "Bad Http Request", http.StatusBadRequest, err)
+			model.WriteOutput(w, "Bad Http Request", http.StatusBadRequest, err)
 			return
 		}
 
 		if strings.Trim(user.UserId, " ") == "" || strings.Trim(user.Password, " ") == "" {
-			WriteOutput(w, "UserID or password can't be empty", http.StatusConflict, err)
+			model.WriteOutput(w, "UserID or password can't be empty", http.StatusConflict, err)
 			return
 		}
 
 		password, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
 		if err != nil {
-			WriteOutput(w, "Error while generating hashed password", http.StatusConflict, err)
+			model.WriteOutput(w, "Error while generating hashed password", http.StatusConflict, err)
 			return
 		}
 
 		err = agents.CreateUser(user.UserId, password)
 		if err != nil {
-			WriteOutput(w, "User already registered on application", http.StatusConflict, err)
+			model.WriteOutput(w, "User already registered on application", http.StatusConflict, err)
 			return
 		}
-		WriteOutput(w, "User Registered on application", http.StatusOK, nil)
+		model.WriteOutput(w, "User Registered on application", http.StatusOK, nil)
 	}
 }
 
@@ -44,12 +44,12 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		var user model.User
 		err := json.NewDecoder(r.Body).Decode(&user)
 		if err != nil {
-			WriteOutput(w, "Bad Http Request", http.StatusBadRequest, err)
+			model.WriteOutput(w, "Bad Http Request", http.StatusBadRequest, err)
 			return
 		}
 
 		if strings.Trim(user.UserId, " ") == "" || strings.Trim(user.Password, " ") == "" {
-			WriteOutput(w, "UserID or password can't be empty", http.StatusConflict, err)
+			model.WriteOutput(w, "UserID or password can't be empty", http.StatusConflict, err)
 			return
 		}
 
@@ -57,9 +57,9 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 
 		errf := bcrypt.CompareHashAndPassword([]byte(creds.Password), []byte(user.Password))
 		if errf != nil {
-			WriteOutput(w, "Either of userId or password is not correct", http.StatusConflict, err)
+			model.WriteOutput(w, "Either of userId or password is not correct", http.StatusConflict, err)
 			return
 		}
-		WriteOutput(w, "User Signed in application", http.StatusOK, nil)
+		model.WriteOutput(w, "User Signed in application", http.StatusOK, nil)
 	}
 }

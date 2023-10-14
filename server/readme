@@ -1,0 +1,13 @@
+CREATE TABLE Users(
+    userID varchar(255) NOT NULL,
+    password varchar(255) NOT NULL,
+    chatId varchar(255),
+    PRIMARY KEY (userID)
+);
+
+CREATE TABLE Chats(
+    chatID varchar(255) NOT NULL,
+    userID varchar(255) NOT NULL,
+    Messages LONGTEXT,
+    PRIMARY KEY (chatID)
+);

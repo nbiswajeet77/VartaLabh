@@ -11,10 +11,35 @@ import (
 	"os"
 	"strings"
 
+	"github.com/google/uuid"
 	"github.com/joho/godotenv"
 
 	"vartalabh.com/m/model"
 )
+
+func CreateChat(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "POST" {
+		var req model.CreateChatRequest
+		err := json.NewDecoder(r.Body).Decode(&req)
+		if err != nil {
+			model.WriteOutput(w, "Bad Http Request", http.StatusBadRequest, err)
+			return
+		}
+		chatId := uuid.New().String()
+		prompt := req.Prompt
+		if prompt == "" {
+			prompt = "you are a mental health counsellor. Talk to user, ask repititive questions,keep the conversation going. Also ask the user how much progress he made based on the prompt provided."
+		}
+		messages := []model.Message{
+			{
+				Role:    "system",
+				Content: prompt,
+			},
+		}
+		// create entry in chat table
+		// update chatId for user table
+	}
+}
 
 func Chat(w http.ResponseWriter, r *http.Request) {
 

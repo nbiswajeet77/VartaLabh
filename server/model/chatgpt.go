@@ -26,3 +26,8 @@ type Response struct {
 	StatusCode int         `json:"statusCode"`
 	Data       interface{} `json:"data"`
 }
+
+type CreateChatRequest struct {
+	UserId string `json:"userId"`
+	Prompt string `json:"Prompt"`
+}
