@@ -2,6 +2,7 @@ package agents
 
 import (
 	"database/sql"
+	"encoding/json"
 	"fmt"
 	"log"
 	"os"
@@ -11,7 +12,9 @@ import (
 	"vartalabh.com/m/model"
 )
 
-func DbConn() (db *sql.DB) {
+var db *sql.DB
+
+func DbConn() {
 	err := godotenv.Load(".env")
 	if err != nil {
 		log.Fatal("Error loading .env file")
@@ -24,16 +27,61 @@ func DbConn() (db *sql.DB) {
 	if err != nil {
 		panic(err.Error())
 	}
-	return db
+}
+
+func FetchParticularChat(chatID string) (*model.GetChatResponse, error) {
+	resp := &model.GetChatResponse{}
+	checkChat, err := db.Query("SELECT chatID, prompt, messages FROM Chats WHERE chatID=?", chatID)
+	if err != nil {
+		return nil, err
+	}
+	defer checkChat.Close()
+	for checkChat.Next() {
+		var chatID, prompt string
+		var msg []byte
+		err = checkChat.Scan(&chatID, &prompt, &msg)
+		if err != nil {
+			return nil, err
+		}
+		var messages []model.Message
+		if err := json.Unmarshal(msg, &messages); err != nil {
+			return nil, err
+		}
+		resp.ChatId = chatID
+		resp.Prompt = prompt
+		resp.Messages = messages
+	}
+	return resp, nil
+}
+
+func FetchUserChats(userID string) ([]*model.ChatHistoryResponse, error) {
+	chathistory := make([]*model.ChatHistoryResponse, 0)
+	checkChats, err := db.Query("SELECT chatID, prompt FROM Chats WHERE userID=?", userID)
+	if err != nil {
+		return nil, err
+	}
+	defer checkChats.Close()
+	for checkChats.Next() {
+		var chatId, prompt string
+		err = checkChats.Scan(&chatId, &prompt)
+		if err != nil {
+			return nil, err
+		}
+		chathistory = append(chathistory, &model.ChatHistoryResponse{
+			ChatId: chatId,
+			Prompt: prompt,
+		})
+	}
+	return chathistory, nil
 }
 
 func FetchUser(userID string) *model.User {
-	db := DbConn()
 	user := &model.User{}
 	checkUser, err := db.Query("SELECT userID, password FROM Users WHERE userID=?", userID)
 	if err != nil {
 		panic(err.Error())
 	}
+	defer checkUser.Close()
 	for checkUser.Next() {
 		var userID, password string
 		err = checkUser.Scan(&userID, &password)
@@ -47,17 +95,39 @@ func FetchUser(userID string) *model.User {
 }
 
 func CreateUser(userID string, password []byte) error {
-	db := DbConn()
 	_, err := db.Exec("INSERT INTO Users(userID,password) VALUES(?,?)", userID, password)
 	if err != nil {
-		fmt.Println("Error when inserting: ", err.Error())
+		fmt.Println("Error when inserting in users table: ", err.Error())
+		return err
+	}
+	return nil
+}
+
+func CreateChatEntry(userID, chatID, prompt string, messages []byte) error {
+	_, err := db.Exec("INSERT INTO Chats(userID,chatID,messages,prompt) VALUES(?,?,?,?)", userID, chatID, messages, prompt)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func UpdateUserCurrentChat(userID, chatId string) error {
+	_, err := db.Exec("UPDATE Users SET chatId = ? WHERE userId = ?;", chatId, userID)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func UpdateChatMessages(chatId string, messages []byte) error {
+	_, err := db.Exec("UPDATE Chats SET messages = ? WHERE chatID = ?;", messages, chatId)
+	if err != nil {
 		return err
 	}
 	return nil
 }
 
 func UpdateUserPrompt(userID, prompt string) {
-	db := DbConn()
 	_, err := db.Exec("UPDATE Users SET prompt = ? WHERE email = ?;", prompt, userID)
 	if err != nil {
 		fmt.Println("Error when Updating for user ID: ", userID, err.Error())

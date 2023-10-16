@@ -9,5 +9,6 @@ CREATE TABLE Chats(
     chatID varchar(255) NOT NULL,
     userID varchar(255) NOT NULL,
     Messages LONGTEXT,
+    Prompt varchar(1023),
     PRIMARY KEY (chatID)
 );

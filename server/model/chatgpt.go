@@ -31,3 +31,27 @@ type CreateChatRequest struct {
 	UserId string `json:"userId"`
 	Prompt string `json:"Prompt"`
 }
+
+type GetChatHistoryRequest struct {
+	UserId string `json:"userId"`
+}
+
+type ChatHistoryResponse struct {
+	ChatId string `json:"chatId"`
+	Prompt string `json:"prompt"`
+}
+
+type GetChatRequest struct {
+	ChatId string `json:"chatId"`
+}
+
+type SendMessageRequest struct {
+	ChatId  string `json:"chatId"`
+	Message string `json:"message"`
+}
+
+type GetChatResponse struct {
+	ChatId   string    `json:"chatId"`
+	Messages []Message `json:"messages"`
+	Prompt   string    `json:"prompt"`
+}
