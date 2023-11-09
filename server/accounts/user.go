@@ -40,7 +40,7 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func LoginHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method == "GET" {
+	if r.Method == "POST" {
 		var user model.User
 		err := json.NewDecoder(r.Body).Decode(&user)
 		if err != nil {
