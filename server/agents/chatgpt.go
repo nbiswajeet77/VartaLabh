@@ -53,7 +53,7 @@ func SendMessage(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetChat(w http.ResponseWriter, r *http.Request) {
-	if r.Method == "GET" {
+	if r.Method == "POST" {
 		var req model.GetChatRequest
 		err := json.NewDecoder(r.Body).Decode(&req)
 		if err != nil {
@@ -70,7 +70,7 @@ func GetChat(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetChatHistory(w http.ResponseWriter, r *http.Request) {
-	if r.Method == "GET" {
+	if r.Method == "POST" {
 		var req model.GetChatHistoryRequest
 		err := json.NewDecoder(r.Body).Decode(&req)
 		if err != nil {
