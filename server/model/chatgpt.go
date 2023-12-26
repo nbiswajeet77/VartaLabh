@@ -12,8 +12,9 @@ type Message struct {
 }
 
 type GPT3Request struct {
-	Model    string    `json:"model"`
-	Messages []Message `json:"messages"`
+	Model     string    `json:"model"`
+	Messages  []Message `json:"messages"`
+	MaxTokens int       `json:"max_tokens"`
 }
 
 type User struct {
