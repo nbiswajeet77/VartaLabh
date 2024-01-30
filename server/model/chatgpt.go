@@ -46,6 +46,10 @@ type GetChatRequest struct {
 	ChatId string `json:"chatId"`
 }
 
+type DeleteChatRequest struct {
+	ChatId string `json:"chatId"`
+}
+
 type SendMessageRequest struct {
 	ChatId  string `json:"chatId"`
 	Message string `json:"message"`

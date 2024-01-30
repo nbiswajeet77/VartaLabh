@@ -54,6 +54,22 @@ func FetchParticularChat(chatID string) (*model.GetChatResponse, error) {
 	return resp, nil
 }
 
+func DeleteParticularChat(chatID string) (int64, error) {
+	query := "DELETE FROM chats WHERE chatId = ?"
+
+	result, err := db.Exec(query, chatID)
+	if err != nil {
+		return 0, err
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return 0, err
+	}
+
+	return rowsAffected, nil
+}
+
 func FetchUserChats(userID string) ([]*model.ChatHistoryResponse, error) {
 	chathistory := make([]*model.ChatHistoryResponse, 0)
 	checkChats, err := db.Query("SELECT chatID, prompt FROM Chats WHERE userID=?", userID)
