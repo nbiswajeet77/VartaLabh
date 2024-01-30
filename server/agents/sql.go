@@ -30,7 +30,7 @@ func DbConn() {
 }
 
 func FetchParticularChat(chatID string) (*model.GetChatResponse, error) {
-	resp := &model.GetChatResponse{}
+	var resp *model.GetChatResponse
 	checkChat, err := db.Query("SELECT chatID, prompt, messages FROM Chats WHERE chatID=?", chatID)
 	if err != nil {
 		return nil, err
@@ -47,9 +47,11 @@ func FetchParticularChat(chatID string) (*model.GetChatResponse, error) {
 		if err := json.Unmarshal(msg, &messages); err != nil {
 			return nil, err
 		}
-		resp.ChatId = chatID
-		resp.Prompt = prompt
-		resp.Messages = messages
+		resp = &model.GetChatResponse{
+			ChatId:   chatID,
+			Prompt:   prompt,
+			Messages: messages,
+		}
 	}
 	return resp, nil
 }
@@ -121,6 +123,14 @@ func CreateUser(userID string, password []byte) error {
 
 func CreateChatEntry(userID, chatID, prompt string, messages []byte) error {
 	_, err := db.Exec("INSERT INTO Chats(userID,chatID,messages,prompt) VALUES(?,?,?,?)", userID, chatID, messages, prompt)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func UpdateChatEntry(chatId, prompt string, messages []byte) error {
+	_, err := db.Exec("UPDATE chats SET prompt = ?, messages = ? WHERE chatId = ?", prompt, messages, chatId)
 	if err != nil {
 		return err
 	}

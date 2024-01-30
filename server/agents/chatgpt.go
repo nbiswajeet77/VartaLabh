@@ -90,6 +90,37 @@ func DeleteChat(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func EditPrompt(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "POST" {
+		var req model.EditPromptRequest
+		err := json.NewDecoder(r.Body).Decode(&req)
+		if err != nil {
+			model.WriteOutput(w, "Bad Http Request", http.StatusBadRequest, err)
+			return
+		}
+
+		chats, err := FetchParticularChat(req.ChatId)
+		if err != nil {
+			model.WriteOutput(w, "Error while fetching user chats in editPrompt API", http.StatusForbidden, err)
+			return
+		} else if chats == nil {
+			model.WriteOutput(w, "Chat was not found", http.StatusNotFound, err)
+			return
+		}
+
+		chats.Messages[0].Content = req.Prompt
+		messages, err := json.Marshal(chats.Messages)
+		if err != nil {
+			model.WriteOutput(w, "Error while marshalling message", http.StatusForbidden, err)
+			return
+		}
+
+		UpdateChatEntry(chats.ChatId, req.Prompt, messages)
+
+		model.WriteOutput(w, "prompt for the chatId updated successfully", http.StatusOK, err)
+	}
+}
+
 func GetChatHistory(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "POST" {
 		var req model.GetChatHistoryRequest

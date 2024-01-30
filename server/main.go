@@ -16,6 +16,7 @@ func handleRequests() {
 	http.HandleFunc("/getChat", agents.GetChat)
 	http.HandleFunc("/sendMessage", agents.SendMessage)
 	http.HandleFunc("/deleteChat", agents.DeleteChat)
+	http.HandleFunc("/editPrompt", agents.EditPrompt)
 	log.Fatal(http.ListenAndServe(":10000", nil))
 }
 
