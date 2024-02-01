@@ -52,6 +52,39 @@ func SendMessage(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func ExitChat(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "POST" {
+		var req model.ExitChatRequest
+		err := json.NewDecoder(r.Body).Decode(&req)
+		if err != nil {
+			model.WriteOutput(w, "Bad Http Request", http.StatusBadRequest, err)
+			return
+		}
+		chats, err := FetchParticularChat(req.ChatId)
+		if err != nil {
+			model.WriteOutput(w, "Error while fetching user chats", http.StatusForbidden, err)
+			return
+		} else if chats == nil {
+			model.WriteOutput(w, "Chat was not found", http.StatusNotFound, err)
+			return
+		}
+
+		messages := chats.Messages
+		messages = append(messages, model.Message{
+			Role:    "user",
+			Content: "Summarise the user's chats till now within 2-3 lines.",
+		})
+		summary := makeChatGptCall(messages)
+		msgs, err := json.Marshal(chats.Messages)
+		if err != nil {
+			model.WriteOutput(w, "Error while marshalling message", http.StatusForbidden, err)
+			return
+		}
+		UpdateChatEntry(chats.ChatId, chats.Prompt, summary.Content, msgs)
+		model.WriteOutput(w, "Chat Exited successfully", http.StatusOK, err)
+	}
+}
+
 func GetChat(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "POST" {
 		var req model.GetChatRequest
@@ -63,6 +96,9 @@ func GetChat(w http.ResponseWriter, r *http.Request) {
 		chats, err := FetchParticularChat(req.ChatId)
 		if err != nil {
 			model.WriteOutput(w, "Error while fetching user chats", http.StatusForbidden, err)
+			return
+		} else if chats == nil {
+			model.WriteOutput(w, "Chat was not found", http.StatusNotFound, err)
 			return
 		}
 		model.WriteOutput(w, chats, http.StatusOK, err)
@@ -115,7 +151,7 @@ func EditPrompt(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		UpdateChatEntry(chats.ChatId, req.Prompt, messages)
+		UpdateChatEntry(chats.ChatId, req.Prompt, chats.Summary, messages)
 
 		model.WriteOutput(w, "prompt for the chatId updated successfully", http.StatusOK, err)
 	}

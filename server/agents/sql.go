@@ -31,15 +31,15 @@ func DbConn() {
 
 func FetchParticularChat(chatID string) (*model.GetChatResponse, error) {
 	var resp *model.GetChatResponse
-	checkChat, err := db.Query("SELECT chatID, prompt, messages FROM Chats WHERE chatID=?", chatID)
+	checkChat, err := db.Query("SELECT chatID, prompt, messages, summary FROM Chats WHERE chatID=?", chatID)
 	if err != nil {
 		return nil, err
 	}
 	defer checkChat.Close()
 	for checkChat.Next() {
-		var chatID, prompt string
+		var chatID, prompt, summary string
 		var msg []byte
-		err = checkChat.Scan(&chatID, &prompt, &msg)
+		err = checkChat.Scan(&chatID, &prompt, &msg, &summary)
 		if err != nil {
 			return nil, err
 		}
@@ -51,6 +51,7 @@ func FetchParticularChat(chatID string) (*model.GetChatResponse, error) {
 			ChatId:   chatID,
 			Prompt:   prompt,
 			Messages: messages,
+			Summary:  summary,
 		}
 	}
 	return resp, nil
@@ -74,20 +75,21 @@ func DeleteParticularChat(chatID string) (int64, error) {
 
 func FetchUserChats(userID string) ([]*model.ChatHistoryResponse, error) {
 	chathistory := make([]*model.ChatHistoryResponse, 0)
-	checkChats, err := db.Query("SELECT chatID, prompt FROM Chats WHERE userID=?", userID)
+	checkChats, err := db.Query("SELECT chatID, prompt, summary FROM Chats WHERE userID=?", userID)
 	if err != nil {
 		return nil, err
 	}
 	defer checkChats.Close()
 	for checkChats.Next() {
-		var chatId, prompt string
-		err = checkChats.Scan(&chatId, &prompt)
+		var chatId, prompt, summary string
+		err = checkChats.Scan(&chatId, &prompt, &summary)
 		if err != nil {
 			return nil, err
 		}
 		chathistory = append(chathistory, &model.ChatHistoryResponse{
-			ChatId: chatId,
-			Prompt: prompt,
+			ChatId:  chatId,
+			Prompt:  prompt,
+			Summary: summary,
 		})
 	}
 	return chathistory, nil
@@ -122,15 +124,15 @@ func CreateUser(userID string, password []byte) error {
 }
 
 func CreateChatEntry(userID, chatID, prompt string, messages []byte) error {
-	_, err := db.Exec("INSERT INTO Chats(userID,chatID,messages,prompt) VALUES(?,?,?,?)", userID, chatID, messages, prompt)
+	_, err := db.Exec("INSERT INTO Chats(userID,chatID,messages,prompt,summary) VALUES(?,?,?,?,?)", userID, chatID, messages, prompt, "")
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func UpdateChatEntry(chatId, prompt string, messages []byte) error {
-	_, err := db.Exec("UPDATE chats SET prompt = ?, messages = ? WHERE chatId = ?", prompt, messages, chatId)
+func UpdateChatEntry(chatId, prompt, summary string, messages []byte) error {
+	_, err := db.Exec("UPDATE chats SET prompt = ?, messages = ?, summary = ? WHERE chatId = ?", prompt, messages, summary, chatId)
 	if err != nil {
 		return err
 	}

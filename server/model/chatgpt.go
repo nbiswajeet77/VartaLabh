@@ -38,11 +38,16 @@ type GetChatHistoryRequest struct {
 }
 
 type ChatHistoryResponse struct {
-	ChatId string `json:"chatId"`
-	Prompt string `json:"prompt"`
+	ChatId  string `json:"chatId"`
+	Prompt  string `json:"prompt"`
+	Summary string `json:"summary"`
 }
 
 type GetChatRequest struct {
+	ChatId string `json:"chatId"`
+}
+
+type ExitChatRequest struct {
 	ChatId string `json:"chatId"`
 }
 
@@ -64,4 +69,5 @@ type GetChatResponse struct {
 	ChatId   string    `json:"chatId"`
 	Messages []Message `json:"messages"`
 	Prompt   string    `json:"prompt"`
+	Summary  string    `json:"summary"`
 }
