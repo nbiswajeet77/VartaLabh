@@ -267,6 +267,6 @@ func makeChatGptCall(messages []model.Message) *model.Message {
 		fmt.Println("Error decoding JSON response:", err)
 		return nil
 	}
-	fmt.Println(gpt3Response)
+
 	return &gpt3Response.Choices[0].Message
 }

@@ -19,4 +19,22 @@ jobs:
           go-version: '1.21'
 
       - name: Build
-        run: cd server ; go build ; cd ..
+        run: cd server ; go build 
+
+      - name: Copy files to Azure server
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.AZURE_SERVER_HOST }}
+          username: ${{ secrets.AZURE_SERVER_USERNAME }}
+          password: ${{ secrets.AZURE_SERVER_PASSWORD }}
+          source: "m"
+          target: "/home/azureuser/VartaLabh/server"
+
+      - name: SSH into Azure server and restart application
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.AZURE_SERVER_HOST }}
+          username: ${{ secrets.AZURE_SERVER_USERNAME }}
+          password: ${{ secrets.AZURE_SERVER_PASSWORD }}
+          script: |
+            sudo systemctl restart goweb.service
