@@ -19,7 +19,7 @@ jobs:
           go-version: '1.21'
 
       - name: Build
-        run: cd server ; go build 
+        run: cd server ; go build ; cd ..
 
       - name: Copy files to server
         uses: appleboy/scp-action@master
@@ -27,7 +27,7 @@ jobs:
           host: ${{ secrets.AZURE_VM_IP }}
           username: ${{ secrets.AZURE_VM_USERNAME }}
           key: ${{ secrets.AZURE_VM_SSH_PRIVATE_KEY }}
-          source: "m"
+          source: "server/m"
           target: "/home/azureuser/VartaLabh/server/"
 
       - name: SSH into Azure server and restart application
