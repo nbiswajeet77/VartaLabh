@@ -31,7 +31,7 @@ func SendMessage(w http.ResponseWriter, r *http.Request) {
 		messages := chats.Messages
 		messages = append(messages, model.Message{
 			Role:    "user",
-			Content: req.Message + "\n # Strictly reply in 2 lines, not more than that gm2.#",
+			Content: req.Message + "\n # Strictly reply in 2 lines, not more than that#",
 		})
 		response := makeChatGptCall(messages)
 		messages = append(messages, model.Message{
