@@ -132,7 +132,7 @@ func CreateChatEntry(userID, chatID, prompt string, messages []byte) error {
 }
 
 func UpdateChatEntry(chatId, prompt, summary string, messages []byte) error {
-	_, err := db.Exec("UPDATE chats SET prompt = ?, messages = ?, summary = ? WHERE chatId = ?", prompt, messages, summary, chatId)
+	_, err := db.Exec("UPDATE Chats SET prompt = ?, messages = ?, summary = ? WHERE chatID = ?", prompt, messages, summary, chatId)
 	if err != nil {
 		return err
 	}
