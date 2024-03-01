@@ -80,7 +80,6 @@ func ExitChat(w http.ResponseWriter, r *http.Request) {
 			model.WriteOutput(w, "Error while marshalling message", http.StatusForbidden, err)
 			return
 		}
-		fmt.Println(summary.Content)
 		UpdateChatEntry(chats.ChatId, chats.Prompt, summary.Content, msgs)
 		model.WriteOutput(w, "Chat Exited successfully", http.StatusOK, err)
 	}
