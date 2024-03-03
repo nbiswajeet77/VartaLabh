@@ -270,3 +270,5 @@ func makeChatGptCall(messages []model.Message) *model.Message {
 
 	return &gpt3Response.Choices[0].Message
 }
+
+func AddToWaitlist(w http.ResponseWriter, r *http.Request) {}

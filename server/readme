@@ -13,3 +13,7 @@ CREATE TABLE Chats(
     summary varchar(1000) NOT NULL,
     PRIMARY KEY (chatID)
 );
+
+CREATE TABLE Emails(
+    emailID varchar(200) NOT NULL
+);
