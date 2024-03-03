@@ -287,5 +287,6 @@ func AddToWaitlist(w http.ResponseWriter, r *http.Request) {
 			model.WriteOutput(w, "Error while creating waitlist email entry", http.StatusBadRequest, err)
 			return
 		}
+		model.WriteOutput(w, "Entry added to Waitlist", http.StatusOK, err)
 	}
 }
