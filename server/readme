@@ -15,5 +15,6 @@ CREATE TABLE Chats(
 );
 
 CREATE TABLE Emails(
-    emailID varchar(200) NOT NULL
+    emailID varchar(200) NOT NULL,
+    PRIMARY KEY (emailID)
 );
