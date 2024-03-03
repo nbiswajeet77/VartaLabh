@@ -33,6 +33,10 @@ type CreateChatRequest struct {
 	Prompt string `json:"Prompt"`
 }
 
+type WaitlistEntryRequest struct {
+	EmailId string `json:"emailId"`
+}
+
 type GetChatHistoryRequest struct {
 	UserId string `json:"userId"`
 }

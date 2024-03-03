@@ -131,6 +131,14 @@ func CreateChatEntry(userID, chatID, prompt string, messages []byte) error {
 	return nil
 }
 
+func CreateWaitlistEntry(emailId string) error {
+	_, err := db.Exec("INSERT INTO Emails(emailID) VALUES(?)", emailId)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func UpdateChatEntry(chatId, prompt, summary string, messages []byte) error {
 	_, err := db.Exec("UPDATE Chats SET prompt = ?, messages = ?, summary = ? WHERE chatID = ?", prompt, messages, summary, chatId)
 	if err != nil {

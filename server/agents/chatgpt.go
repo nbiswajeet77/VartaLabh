@@ -273,3 +273,19 @@ func makeChatGptCall(messages []model.Message) *model.Message {
 
 	return &gpt3Response.Choices[0].Message
 }
+
+func AddToWaitlist(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "POST" {
+		var req model.WaitlistEntryRequest
+		err := json.NewDecoder(r.Body).Decode(&req)
+		if err != nil {
+			model.WriteOutput(w, "Bad Http Request", http.StatusBadRequest, err)
+			return
+		}
+		err = CreateWaitlistEntry(req.EmailId)
+		if err != nil {
+			model.WriteOutput(w, "Error while creating waitlist email entry", http.StatusBadRequest, err)
+			return
+		}
+	}
+}
