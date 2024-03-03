@@ -31,7 +31,7 @@ func SendMessage(w http.ResponseWriter, r *http.Request) {
 		messages := chats.Messages
 		messages = append(messages, model.Message{
 			Role:    "user",
-			Content: req.Message + "\n # Strictly reply in 2 lines, not more than that#",
+			Content: req.Message + "\n # Strictly reply in 3-4 lines, not more than that#",
 		})
 		response := makeChatGptCall(messages)
 		messages = append(messages, model.Message{
@@ -225,9 +225,8 @@ func makeChatGptCall(messages []model.Message) *model.Message {
 	endpoint := "https://api.openai.com/v1/chat/completions"
 
 	reqBody := &model.GPT3Request{
-		Model:     "gpt-3.5-turbo",
-		Messages:  messages,
-		MaxTokens: 100,
+		Model:    "gpt-3.5-turbo",
+		Messages: messages,
 	}
 
 	requestBody, err := json.Marshal(reqBody)
