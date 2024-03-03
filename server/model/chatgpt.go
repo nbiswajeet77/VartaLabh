@@ -14,7 +14,7 @@ type Message struct {
 type GPT3Request struct {
 	Model     string    `json:"model"`
 	Messages  []Message `json:"messages"`
-	MaxTokens int       `json:"max_tokens"`
+	MaxTokens int       `json:"max_tokens",omitempty`
 }
 
 type User struct {
