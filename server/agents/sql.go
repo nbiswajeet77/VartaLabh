@@ -76,21 +76,24 @@ func DeleteParticularChat(chatID string) (int64, error) {
 
 func FetchUserChats(userID string) ([]*model.ChatHistoryResponse, error) {
 	chathistory := make([]*model.ChatHistoryResponse, 0)
-	checkChats, err := db.Query("SELECT chatID, prompt, summary FROM Chats WHERE userID=?", userID)
+	checkChats, err := db.Query("SELECT chatID, prompt, summary, createdAt, updatedAt FROM Chats WHERE userID=?", userID)
 	if err != nil {
 		return nil, err
 	}
 	defer checkChats.Close()
 	for checkChats.Next() {
 		var chatId, prompt, summary string
-		err = checkChats.Scan(&chatId, &prompt, &summary)
+		var createdAt, updatedAt time.Time
+		err = checkChats.Scan(&chatId, &prompt, &summary, &createdAt, &updatedAt)
 		if err != nil {
 			return nil, err
 		}
 		chathistory = append(chathistory, &model.ChatHistoryResponse{
-			ChatId:  chatId,
-			Prompt:  prompt,
-			Summary: summary,
+			ChatId:    chatId,
+			Prompt:    prompt,
+			Summary:   summary,
+			CreatedAt: createdAt,
+			UpdatedAt: updatedAt,
 		})
 	}
 	return chathistory, nil
@@ -116,8 +119,8 @@ func FetchUser(userID string) *model.User {
 }
 
 func CreateUser(userID string, password []byte) error {
-	updatedAt := time.Now().Format("2006-01-02 15:04:05")
-	_, err := db.Exec("INSERT INTO Users(userID,password,createdAt,updatedAt) VALUES(?,?,?,?)", userID, password, updatedAt, updatedAt)
+	createdAt := time.Now().Format("2006-01-02 15:04:05")
+	_, err := db.Exec("INSERT INTO Users(userID,password,createdAt,updatedAt) VALUES(?,?,?,?)", userID, password, createdAt, createdAt)
 	if err != nil {
 		fmt.Println("Error when inserting in users table: ", err.Error())
 		return err
@@ -126,7 +129,8 @@ func CreateUser(userID string, password []byte) error {
 }
 
 func CreateChatEntry(userID, chatID, prompt string, messages []byte) error {
-	_, err := db.Exec("INSERT INTO Chats(userID,chatID,messages,prompt,summary) VALUES(?,?,?,?,?)", userID, chatID, messages, prompt, "")
+	createdAt := time.Now().Format("2006-01-02 15:04:05")
+	_, err := db.Exec("INSERT INTO Chats(userID,chatID,messages,prompt,summary,createdAt,updatedAt) VALUES(?,?,?,?,?,?,?)", userID, chatID, messages, prompt, "", createdAt, createdAt)
 	if err != nil {
 		return err
 	}

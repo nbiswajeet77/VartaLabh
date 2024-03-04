@@ -1,5 +1,7 @@
 package model
 
+import "time"
+
 type GPT3Response struct {
 	Choices []struct {
 		Message Message `json:"message"`
@@ -31,9 +33,11 @@ type GetChatHistoryRequest struct {
 }
 
 type ChatHistoryResponse struct {
-	ChatId  string `json:"chatId"`
-	Prompt  string `json:"prompt"`
-	Summary string `json:"summary"`
+	ChatId    string    `json:"chatId"`
+	Prompt    string    `json:"prompt"`
+	Summary   string    `json:"summary"`
+	CreatedAt time.Time `json:"createdAt"`
+	UpdatedAt time.Time `json:"updatedAt"`
 }
 
 type GetChatRequest struct {
