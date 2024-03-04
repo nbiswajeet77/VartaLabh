@@ -229,7 +229,7 @@ func makeChatGptCall(messages []model.Message) *model.Message {
 	endpoint := "https://api.openai.com/v1/chat/completions"
 
 	reqBody := &model.GPT3Request{
-		Model:    "gpt-3.5-turbo",
+		Model:    "gpt-4-turbo-preview",
 		Messages: messages,
 	}
 
