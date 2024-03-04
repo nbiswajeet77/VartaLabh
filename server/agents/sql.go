@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"time"
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/joho/godotenv"
@@ -29,9 +30,9 @@ func DbConn() {
 	}
 }
 
-func FetchParticularChat(chatID string) (*model.GetChatResponse, error) {
-	var resp *model.GetChatResponse
-	checkChat, err := db.Query("SELECT chatID, prompt, messages, summary FROM Chats WHERE chatID=?", chatID)
+func FetchParticularChat(chatID string) (*model.Chat, error) {
+	var resp *model.Chat
+	checkChat, err := db.Query("SELECT * FROM Chats WHERE chatID=?", chatID)
 	if err != nil {
 		return nil, err
 	}
@@ -47,7 +48,7 @@ func FetchParticularChat(chatID string) (*model.GetChatResponse, error) {
 		if err := json.Unmarshal(msg, &messages); err != nil {
 			return nil, err
 		}
-		resp = &model.GetChatResponse{
+		resp = &model.Chat{
 			ChatId:   chatID,
 			Prompt:   prompt,
 			Messages: messages,
@@ -58,7 +59,7 @@ func FetchParticularChat(chatID string) (*model.GetChatResponse, error) {
 }
 
 func DeleteParticularChat(chatID string) (int64, error) {
-	query := "DELETE FROM chats WHERE chatId = ?"
+	query := "DELETE FROM Chats WHERE chatID = ?"
 
 	result, err := db.Exec(query, chatID)
 	if err != nil {
@@ -115,7 +116,8 @@ func FetchUser(userID string) *model.User {
 }
 
 func CreateUser(userID string, password []byte) error {
-	_, err := db.Exec("INSERT INTO Users(userID,password) VALUES(?,?)", userID, password)
+	updatedAt := time.Now().Format("2006-01-02 15:04:05")
+	_, err := db.Exec("INSERT INTO Users(userID,password,createdAt,updatedAt) VALUES(?,?,?,?)", userID, password, updatedAt, updatedAt)
 	if err != nil {
 		fmt.Println("Error when inserting in users table: ", err.Error())
 		return err
@@ -148,7 +150,8 @@ func UpdateChatEntry(chatId, prompt, summary string, messages []byte) error {
 }
 
 func UpdateUserCurrentChat(userID, chatId string) error {
-	_, err := db.Exec("UPDATE Users SET chatId = ? WHERE userId = ?;", chatId, userID)
+	updatedAt := time.Now().Format("2006-01-02 15:04:05")
+	_, err := db.Exec("UPDATE Users SET chatId = ?, updatedAt = ? WHERE userId = ?;", chatId, updatedAt, userID)
 	if err != nil {
 		return err
 	}
