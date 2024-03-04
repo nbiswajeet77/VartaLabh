@@ -32,7 +32,7 @@ func DbConn() {
 
 func FetchParticularChat(chatID string) (*model.Chat, error) {
 	var resp *model.Chat
-	checkChat, err := db.Query("SELECT * FROM Chats WHERE chatID=?", chatID)
+	checkChat, err := db.Query("SELECT chatID, prompt, messages, summary FROM Chats WHERE chatID=?", chatID)
 	if err != nil {
 		return nil, err
 	}
