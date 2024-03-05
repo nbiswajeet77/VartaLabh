@@ -2,8 +2,8 @@ CREATE TABLE Users(
     userID varchar(255) NOT NULL,
     password varchar(255) NOT NULL,
     chatId varchar(255),
-    createdAt DATETIME,
-    updatedAt DATETIME,
+    createdAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updatedAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (userID)
 );
 
@@ -13,8 +13,8 @@ CREATE TABLE Chats(
     Messages LONGTEXT,
     Prompt varchar(8000),
     summary varchar(1000) NOT NULL,
-    createdAt DATETIME,
-    updatedAt DATETIME,
+    createdAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updatedAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (chatID)
 );
 
