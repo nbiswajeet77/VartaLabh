@@ -84,9 +84,13 @@ func FetchUserChats(userID string) ([]*model.ChatHistoryResponse, error) {
 	for checkChats.Next() {
 		var chatId, prompt, summary string
 		var createdAt, updatedAt time.Time
-		var messages []Message
-		err = checkChats.Scan(&chatId, &prompt, &summary, &messages, &createdAt, &updatedAt)
+		var msg []byte
+		err = checkChats.Scan(&chatId, &prompt, &summary, &msg, &createdAt, &updatedAt)
 		if err != nil {
+			return nil, err
+		}
+		var messages []model.Message
+		if err := json.Unmarshal(msg, &messages); err != nil {
 			return nil, err
 		}
 		if len(messages) > 2 {
