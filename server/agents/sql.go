@@ -76,7 +76,7 @@ func DeleteParticularChat(chatID string) (int64, error) {
 
 func FetchUserChats(userID string) ([]*model.ChatHistoryResponse, error) {
 	chathistory := make([]*model.ChatHistoryResponse, 0)
-	checkChats, err := db.Query("SELECT chatID, prompt, summary, createdAt, updatedAt FROM Chats WHERE userID=?", userID)
+	checkChats, err := db.Query("SELECT chatID, prompt, summary, messages, createdAt, updatedAt FROM Chats WHERE userID=?", userID)
 	if err != nil {
 		return nil, err
 	}
@@ -84,17 +84,24 @@ func FetchUserChats(userID string) ([]*model.ChatHistoryResponse, error) {
 	for checkChats.Next() {
 		var chatId, prompt, summary string
 		var createdAt, updatedAt time.Time
-		err = checkChats.Scan(&chatId, &prompt, &summary, &createdAt, &updatedAt)
+		var msg []byte
+		err = checkChats.Scan(&chatId, &prompt, &summary, &msg, &createdAt, &updatedAt)
 		if err != nil {
 			return nil, err
 		}
-		chathistory = append(chathistory, &model.ChatHistoryResponse{
-			ChatId:    chatId,
-			Prompt:    prompt,
-			Summary:   summary,
-			CreatedAt: createdAt,
-			UpdatedAt: updatedAt,
-		})
+		var messages []model.Message
+		if err := json.Unmarshal(msg, &messages); err != nil {
+			return nil, err
+		}
+		if len(messages) > 2 {
+			chathistory = append(chathistory, &model.ChatHistoryResponse{
+				ChatId:    chatId,
+				Prompt:    prompt,
+				Summary:   summary,
+				CreatedAt: createdAt,
+				UpdatedAt: updatedAt,
+			})
+		}
 	}
 	return chathistory, nil
 }
