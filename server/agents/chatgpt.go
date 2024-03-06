@@ -194,7 +194,7 @@ func CreateChat(w http.ResponseWriter, r *http.Request) {
 			},
 			{
 				Role:    "assistant",
-				Content: "Hey " + req.UserId + "! How are you?",
+				Content: "Hey " + req.UserId + "! Anything on your mind lately?",
 			},
 		}
 		messages, err := json.Marshal(message)
