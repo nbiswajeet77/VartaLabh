@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"time"
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/joho/godotenv"
@@ -29,8 +30,8 @@ func DbConn() {
 	}
 }
 
-func FetchParticularChat(chatID string) (*model.GetChatResponse, error) {
-	var resp *model.GetChatResponse
+func FetchParticularChat(chatID string) (*model.Chat, error) {
+	var resp *model.Chat
 	checkChat, err := db.Query("SELECT chatID, prompt, messages, summary FROM Chats WHERE chatID=?", chatID)
 	if err != nil {
 		return nil, err
@@ -47,7 +48,7 @@ func FetchParticularChat(chatID string) (*model.GetChatResponse, error) {
 		if err := json.Unmarshal(msg, &messages); err != nil {
 			return nil, err
 		}
-		resp = &model.GetChatResponse{
+		resp = &model.Chat{
 			ChatId:   chatID,
 			Prompt:   prompt,
 			Messages: messages,
@@ -58,7 +59,7 @@ func FetchParticularChat(chatID string) (*model.GetChatResponse, error) {
 }
 
 func DeleteParticularChat(chatID string) (int64, error) {
-	query := "DELETE FROM chats WHERE chatId = ?"
+	query := "DELETE FROM Chats WHERE chatID = ?"
 
 	result, err := db.Exec(query, chatID)
 	if err != nil {
@@ -75,21 +76,24 @@ func DeleteParticularChat(chatID string) (int64, error) {
 
 func FetchUserChats(userID string) ([]*model.ChatHistoryResponse, error) {
 	chathistory := make([]*model.ChatHistoryResponse, 0)
-	checkChats, err := db.Query("SELECT chatID, prompt, summary FROM Chats WHERE userID=?", userID)
+	checkChats, err := db.Query("SELECT chatID, prompt, summary, createdAt, updatedAt FROM Chats WHERE userID=?", userID)
 	if err != nil {
 		return nil, err
 	}
 	defer checkChats.Close()
 	for checkChats.Next() {
 		var chatId, prompt, summary string
-		err = checkChats.Scan(&chatId, &prompt, &summary)
+		var createdAt, updatedAt time.Time
+		err = checkChats.Scan(&chatId, &prompt, &summary, &createdAt, &updatedAt)
 		if err != nil {
 			return nil, err
 		}
 		chathistory = append(chathistory, &model.ChatHistoryResponse{
-			ChatId:  chatId,
-			Prompt:  prompt,
-			Summary: summary,
+			ChatId:    chatId,
+			Prompt:    prompt,
+			Summary:   summary,
+			CreatedAt: createdAt,
+			UpdatedAt: updatedAt,
 		})
 	}
 	return chathistory, nil
@@ -115,7 +119,8 @@ func FetchUser(userID string) *model.User {
 }
 
 func CreateUser(userID string, password []byte) error {
-	_, err := db.Exec("INSERT INTO Users(userID,password) VALUES(?,?)", userID, password)
+	createdAt := time.Now().Format("2006-01-02 15:04:05")
+	_, err := db.Exec("INSERT INTO Users(userID,password,createdAt,updatedAt) VALUES(?,?,?,?)", userID, password, createdAt, createdAt)
 	if err != nil {
 		fmt.Println("Error when inserting in users table: ", err.Error())
 		return err
@@ -124,7 +129,8 @@ func CreateUser(userID string, password []byte) error {
 }
 
 func CreateChatEntry(userID, chatID, prompt string, messages []byte) error {
-	_, err := db.Exec("INSERT INTO Chats(userID,chatID,messages,prompt,summary) VALUES(?,?,?,?,?)", userID, chatID, messages, prompt, "")
+	createdAt := time.Now().Format("2006-01-02 15:04:05")
+	_, err := db.Exec("INSERT INTO Chats(userID,chatID,messages,prompt,summary,createdAt,updatedAt) VALUES(?,?,?,?,?,?,?)", userID, chatID, messages, prompt, "", createdAt, createdAt)
 	if err != nil {
 		return err
 	}
@@ -148,7 +154,8 @@ func UpdateChatEntry(chatId, prompt, summary string, messages []byte) error {
 }
 
 func UpdateUserCurrentChat(userID, chatId string) error {
-	_, err := db.Exec("UPDATE Users SET chatId = ? WHERE userId = ?;", chatId, userID)
+	updatedAt := time.Now().Format("2006-01-02 15:04:05")
+	_, err := db.Exec("UPDATE Users SET chatId = ?, updatedAt = ? WHERE userId = ?;", chatId, updatedAt, userID)
 	if err != nil {
 		return err
 	}
