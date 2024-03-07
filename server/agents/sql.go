@@ -93,7 +93,7 @@ func FetchUserChats(userID string) ([]*model.ChatHistoryResponse, error) {
 		if err := json.Unmarshal(msg, &messages); err != nil {
 			return nil, err
 		}
-		if len(messages) > 1 {
+		if len(messages) > 2 {
 			chathistory = append(chathistory, &model.ChatHistoryResponse{
 				ChatId:    chatId,
 				Prompt:    prompt,
