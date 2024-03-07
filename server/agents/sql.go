@@ -103,6 +103,12 @@ func FetchUserChats(userID string) ([]*model.ChatHistoryResponse, error) {
 			})
 		}
 	}
+	length := len(chathistory)
+
+	for i := 0; i < length/2; i++ {
+		chathistory[i], chathistory[length-1-i] = chathistory[length-1-i], chathistory[i]
+	}
+
 	return chathistory, nil
 }
 
