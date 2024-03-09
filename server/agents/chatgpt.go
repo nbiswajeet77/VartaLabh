@@ -4,12 +4,14 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/google/uuid"
-	"github.com/joho/godotenv"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
+
+	"github.com/google/uuid"
+	"github.com/joho/godotenv"
+
 	"vartalabh.com/m/model"
 )
 
@@ -73,8 +75,12 @@ func ExitChat(w http.ResponseWriter, r *http.Request) {
 			Content: "Summarise the user's chats till now within 2-3 lines.",
 		})
 		summary := makeChatGptCall(messages)
-
-		UpdateChatSummary(chats.ChatId, summary.Content)
+		msgs, err := json.Marshal(chats.Messages)
+		if err != nil {
+			model.WriteOutput(w, "Error while marshalling message", http.StatusForbidden, err)
+			return
+		}
+		UpdateChatEntry(chats.ChatId, chats.Prompt, summary.Content, msgs)
 		model.WriteOutput(w, "Chat Exited successfully", http.StatusOK, err)
 	}
 }
