@@ -166,6 +166,14 @@ func UpdateChatEntry(chatId, prompt, summary string, messages []byte) error {
 	return nil
 }
 
+func UpdateChatSummary(chatId, summary string) error {
+	_, err := db.Exec("UPDATE Chats SET summary = ? WHERE chatID = ?", summary, chatId)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func UpdateUserCurrentChat(userID, chatId string) error {
 	updatedAt := time.Now().Format("2006-01-02 15:04:05")
 	_, err := db.Exec("UPDATE Users SET chatId = ?, updatedAt = ? WHERE userId = ?;", chatId, updatedAt, userID)
