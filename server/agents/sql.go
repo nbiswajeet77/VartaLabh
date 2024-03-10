@@ -76,7 +76,7 @@ func DeleteParticularChat(chatID string) (int64, error) {
 
 func FetchUserChats(userID string) ([]*model.ChatHistoryResponse, error) {
 	chathistory := make([]*model.ChatHistoryResponse, 0)
-	checkChats, err := db.Query("SELECT chatID, prompt, summary, messages, createdAt, updatedAt FROM Chats WHERE userID=? ORDER BY updatedAt DESC;", userID)
+	checkChats, err := db.Query("SELECT chatID, prompt, summary, messages, createdAt, updatedAt FROM Chats WHERE userID=? ORDER BY updatedAt ASC;", userID)
 	if err != nil {
 		return nil, err
 	}
