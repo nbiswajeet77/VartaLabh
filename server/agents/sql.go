@@ -175,6 +175,9 @@ func UpdateChatSummary(chatId, summary string) error {
 }
 
 func UpdateUserCurrentChat(userID, chatId string) error {
+	if userID == "" {
+		return nil
+	}
 	updatedAt := time.Now().Format("2006-01-02 15:04:05")
 	_, err := db.Exec("UPDATE Users SET chatId = ?, updatedAt = ? WHERE userId = ?;", chatId, updatedAt, userID)
 	if err != nil {
