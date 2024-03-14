@@ -180,8 +180,8 @@ func UpdateUserCurrentChat(userID, chatId string) error {
 		return nil
 	}
 	updatedAt := time.Now().Format("2006-01-02 15:04:05")
-	var uid = userID
-	if userID == nil {
+	var uid string = userID
+	if userID == "" {
 		uid = uuid.New().String()
 	}
 	_, err := db.Exec("UPDATE Users SET chatId = ?, updatedAt = ? WHERE userId = ?;", chatId, updatedAt, uid)
