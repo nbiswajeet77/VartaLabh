@@ -9,6 +9,7 @@ import (
 	"time"
 
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/google/uuid"
 	"github.com/joho/godotenv"
 	"vartalabh.com/m/model"
 )
@@ -175,11 +176,14 @@ func UpdateChatSummary(chatId, summary string) error {
 }
 
 func UpdateUserCurrentChat(userID, chatId string) error {
-	if userID == "" {
-		return nil
-	}
 	updatedAt := time.Now().Format("2006-01-02 15:04:05")
-	_, err := db.Exec("UPDATE Users SET chatId = ?, updatedAt = ? WHERE userId = ?;", chatId, updatedAt, userID)
+	var uid string
+	if userID == "" {
+		uid = uuid.New().String()
+	} else {
+		uid = userID
+	}
+	_, err := db.Exec("UPDATE Users SET chatId = ?, updatedAt = ? WHERE userId = ?;", chatId, updatedAt, uid)
 	if err != nil {
 		return err
 	}
