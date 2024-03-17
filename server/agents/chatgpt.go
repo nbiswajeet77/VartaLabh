@@ -37,7 +37,7 @@ func SendMessage(w http.ResponseWriter, r *http.Request) {
 		} else {
 			messages = append(messages, model.Message{
 				Role:    "user",
-				Content: req.Message + "\n ## Give a short definite solution without asking a question ##",
+				Content: req.Message + "\n ## Give a short definite solution ##",
 			})
 		}
 		response := makeChatGptCall(messages)
