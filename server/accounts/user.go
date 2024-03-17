@@ -60,6 +60,15 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 			model.WriteOutput(w, "Either of userId or password is not correct", http.StatusConflict, err)
 			return
 		}
-		model.WriteOutput(w, "User Signed in application", http.StatusOK, nil)
+		userId, err := model.GenerateToken(user.UserId)
+		if err != nil {
+			model.WriteOutput(w, "Error while creating JWT Token", http.StatusConflict, err)
+			return
+		}
+		response := map[string]interface{}{
+			"userId":  userId,
+			"Message": "User Signed in application",
+		}
+		model.WriteOutput(w, response, http.StatusOK, nil)
 	}
 }

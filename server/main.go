@@ -6,13 +6,16 @@ import (
 
 	"vartalabh.com/m/accounts"
 	"vartalabh.com/m/agents"
+	"vartalabh.com/m/model"
 )
 
 func handleRequests() {
-	http.HandleFunc("/chat/new", agents.CreateChat)
 	http.HandleFunc("/register", accounts.RegisterHandler)
+
 	http.HandleFunc("/login", accounts.LoginHandler)
+	http.HandleFunc("/chat/new", agents.CreateChat)
 	http.HandleFunc("/chat/history", agents.GetChatHistory)
+
 	http.HandleFunc("/getChat", agents.GetChat)
 	http.HandleFunc("/sendMessage", agents.SendMessage)
 	http.HandleFunc("/deleteChat", agents.DeleteChat)
@@ -24,5 +27,6 @@ func handleRequests() {
 
 func main() {
 	agents.DbConn()
+	model.GetDecryptionSecret()
 	handleRequests()
 }
