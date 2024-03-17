@@ -29,17 +29,12 @@ func SendMessage(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		messages := chats.Messages
-		if len(messages)%8 != 0 {
-			messages = append(messages, model.Message{
-				Role:    "user",
-				Content: req.Message + "\n ## Reply in maximum 4 lines, not more than that ##",
-			})
-		} else {
-			messages = append(messages, model.Message{
-				Role:    "user",
-				Content: req.Message + "\n ## Give a short definite solution except therapy ##",
-			})
-		}
+
+		messages = append(messages, model.Message{
+			Role:    "user",
+			Content: req.Message + "\n ## Reply in maximum 4 lines, not more than that ##",
+		})
+
 		response := makeChatGptCall(messages)
 		messages = append(messages, model.Message{
 			Role:    "system",
