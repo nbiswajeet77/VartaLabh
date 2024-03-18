@@ -159,11 +159,16 @@ func GetChatHistory(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "POST" {
 		var req model.GetChatHistoryRequest
 		err := json.NewDecoder(r.Body).Decode(&req)
+		userId, err := model.DecryptToken(req.UserId)
+		if err != nil {
+			model.WriteOutput(w, "Error while decrypting token", http.StatusBadRequest, err)
+			return
+		}
 		if err != nil {
 			model.WriteOutput(w, "Bad Http Request", http.StatusBadRequest, err)
 			return
 		}
-		chats, err := FetchUserChats(req.UserId)
+		chats, err := FetchUserChats(userId)
 		if err != nil {
 			model.WriteOutput(w, "Error while fetching user chats", http.StatusForbidden, err)
 			return
@@ -178,6 +183,11 @@ func CreateChat(w http.ResponseWriter, r *http.Request) {
 		err := json.NewDecoder(r.Body).Decode(&req)
 		if err != nil {
 			model.WriteOutput(w, "Bad Http Request", http.StatusBadRequest, err)
+			return
+		}
+		userId, err := model.DecryptToken(req.UserId)
+		if err != nil {
+			model.WriteOutput(w, "Error while decrypting token", http.StatusBadRequest, err)
 			return
 		}
 		chatId := uuid.New().String()
@@ -234,12 +244,12 @@ func CreateChat(w http.ResponseWriter, r *http.Request) {
 			model.WriteOutput(w, "Error while marshalling message", http.StatusForbidden, err)
 			return
 		}
-		err = UpdateUserCurrentChat(req.UserId, chatId)
+		err = UpdateUserCurrentChat(userId, chatId)
 		if err != nil {
 			model.WriteOutput(w, "Error while updating users's current chat", http.StatusForbidden, err)
 			return
 		}
-		err = CreateChatEntry(req.UserId, chatId, prompt, messages)
+		err = CreateChatEntry(userId, chatId, prompt, messages)
 		if err != nil {
 			model.WriteOutput(w, "Error while creating chat entry", http.StatusForbidden, err)
 			return
