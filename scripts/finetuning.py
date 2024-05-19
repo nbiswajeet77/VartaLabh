@@ -1,5 +1,5 @@
 from openai import OpenAI
-client = OpenAI(api_key="")
+#client = OpenAI(api_key="")
 
 client.fine_tuning.jobs.create(
   training_file="file-zTfK21gpZW1ZfVEMKJmT30Pb", 
