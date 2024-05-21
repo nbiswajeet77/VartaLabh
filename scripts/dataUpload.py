@@ -32,7 +32,7 @@ def print_distribution(values, name):
     print(f"p5 / p95: {np.quantile(values, 0.1)}, {np.quantile(values, 0.9)}")
 
 def upload_data():
-    ####
+    client = OpenAI(api_key="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")
     client.files.create(
       file=open(data_path, "rb"),
       purpose="fine-tune"
