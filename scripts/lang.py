@@ -5,7 +5,7 @@ from langchain.prompts import PromptTemplate
 from langchain.chains import LLMChain
 
 # Set up your OpenAI API key
-openai.api_key = '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'
+openai.api_key = 'enter-api-key'
 
 class Node:
     def __init__(self, name, prompt_template, condition):
